@@ -10,25 +10,25 @@ import dev.vexide.hydrozoa.devices.smart.Motor.BrakeMode
 import dev.vexide.hydrozoa.devices.smart.MotorControl
 import dev.vexide.hydrozoa.devices.smart.MotorControl.Brake
 import dev.vexide.hydrozoa.devices.smart.MotorControl.Voltage
+import dev.vexide.hydrozoa.display.Display
 
-private const val GEAR_RATIO = 7
 private const val ARM_SPEED = Int.MAX_VALUE
 
-private val ARM_DOWN = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
-private val ElBOW_DOWN = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
-private val WRIST_DOWN = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
+private val ARM_DOWN = EncoderPosition.ofDegrees(0.0)
+private val ElBOW_DOWN = EncoderPosition.ofDegrees(0.0)
+private val WRIST_DOWN = EncoderPosition.ofDegrees(0.0)
 
-private val ARM_FORWARD = EncoderPosition.ofDegrees(30.0 * GEAR_RATIO)
-private val ElBOW_FORWARD = EncoderPosition.ofDegrees(120.0 * GEAR_RATIO)
-private val WRIST_FORWARD = EncoderPosition.ofDegrees(-100.0 * GEAR_RATIO)
+private val ARM_FORWARD = EncoderPosition.ofDegrees(-245.0)
+private val ElBOW_FORWARD = EncoderPosition.ofDegrees(755.0)
+private val WRIST_FORWARD = EncoderPosition.ofDegrees(70.0)
 
-private val ARM_LOW = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
-private val ElBOW_LOW = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
-private val WRIST_LOW = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
+private val ARM_LOW = EncoderPosition.ofDegrees(125.0)
+private val ElBOW_LOW = EncoderPosition.ofDegrees(800.0)
+private val WRIST_LOW = EncoderPosition.ofDegrees(50.0)
 
-private val ARM_HIGH = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
-private val ElBOW_HIGH = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
-private val WRIST_HIGH = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
+private val ARM_HIGH = EncoderPosition.ofDegrees(312.0)
+private val ElBOW_HIGH = EncoderPosition.ofDegrees(900.0)
+private val WRIST_HIGH = EncoderPosition.ofDegrees(92.0)
 
 
 class Robot(peripherals: Peripherals):  CompetitionRobot{
@@ -38,6 +38,7 @@ class Robot(peripherals: Peripherals):  CompetitionRobot{
     var elbow = Motor(peripherals.takePort(4), Motor.Gearset.Red, Motor.Direction.REVERSE)
     var claw = Motor(peripherals.takePort(5), Motor.Gearset.Red, Motor.Direction.FORWARD)
     var wrist = Motor(peripherals.takePort(6), Motor.Gearset.Green, Motor.Direction.FORWARD)
+//    var display = Display(peripherals.takeDisplay())
     var controller = peripherals.takeController(Controller.Id.Primary)
     override fun driverInit()  {
         elbow.target = Brake(BrakeMode.BRAKE)
@@ -57,6 +58,7 @@ class Robot(peripherals: Peripherals):  CompetitionRobot{
         val rightVoltage = (turn - forward) * Motor.V5_MAX_VOLTAGE
 
         try {
+
             left_Drive.target = Voltage(leftVoltage)
             right_Drive.target = Voltage(rightVoltage)
 
@@ -81,13 +83,14 @@ class Robot(peripherals: Peripherals):  CompetitionRobot{
                 elbow.target = MotorControl.Position(ElBOW_LOW, ARM_SPEED)
                 wrist.target = MotorControl.Position(WRIST_LOW, ARM_SPEED)
             }
-//
-//            if (input.x.isNowPressed) {
-//                // high score
-//                arm.target = MotorControl.Position(ARM_UP, ARM_SPEED)
-//                elbow.target = MotorControl.Position(ElBOW_UP, ARM_SPEED)
-//            }
-//
+
+            if (input.x.isNowPressed) {
+                // high score
+                arm.target = MotorControl.Position(ARM_HIGH, ARM_SPEED)
+                elbow.target = MotorControl.Position(ElBOW_HIGH, ARM_SPEED)
+                wrist.target = MotorControl.Position(WRIST_HIGH, ARM_SPEED)
+            }
+
             if (input.y.isNowPressed) {
                 // forward grab
                 arm.target = MotorControl.Position(ARM_FORWARD, ARM_SPEED)
