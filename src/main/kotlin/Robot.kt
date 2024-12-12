@@ -13,12 +13,22 @@ import dev.vexide.hydrozoa.devices.smart.MotorControl.Voltage
 
 private const val GEAR_RATIO = 7
 private const val ARM_SPEED = Int.MAX_VALUE
-private val ARM_UP = EncoderPosition.ofDegrees(110.0 * GEAR_RATIO)
+
 private val ARM_DOWN = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
-private val ARM_MID = EncoderPosition.ofDegrees(52.0 * GEAR_RATIO)
-private val ElBOW_UP = EncoderPosition.ofDegrees(90.0 * GEAR_RATIO)
-private val ELBOW_DOWN = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
-private val ELBOW_MID = EncoderPosition.ofDegrees(45.0 * GEAR_RATIO)
+private val ElBOW_DOWN = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
+private val WRIST_DOWN = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
+
+private val ARM_FORWARD = EncoderPosition.ofDegrees(30.0 * GEAR_RATIO)
+private val ElBOW_FORWARD = EncoderPosition.ofDegrees(120.0 * GEAR_RATIO)
+private val WRIST_FORWARD = EncoderPosition.ofDegrees(-100.0 * GEAR_RATIO)
+
+private val ARM_LOW = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
+private val ElBOW_LOW = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
+private val WRIST_LOW = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
+
+private val ARM_HIGH = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
+private val ElBOW_HIGH = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
+private val WRIST_HIGH = EncoderPosition.ofDegrees(0.0 * GEAR_RATIO)
 
 
 class Robot(peripherals: Peripherals):  CompetitionRobot{
@@ -27,10 +37,12 @@ class Robot(peripherals: Peripherals):  CompetitionRobot{
     var arm = Motor(peripherals.takePort(3), Motor.Gearset.Red, Motor.Direction.FORWARD)
     var elbow = Motor(peripherals.takePort(4), Motor.Gearset.Red, Motor.Direction.REVERSE)
     var claw = Motor(peripherals.takePort(5), Motor.Gearset.Red, Motor.Direction.FORWARD)
+    var wrist = Motor(peripherals.takePort(6), Motor.Gearset.Green, Motor.Direction.FORWARD)
     var controller = peripherals.takeController(Controller.Id.Primary)
     override fun driverInit()  {
         elbow.target = Brake(BrakeMode.BRAKE)
         arm.target = Brake(BrakeMode.BRAKE)
+        wrist.target = Brake(BrakeMode.BRAKE)
     }
 
 
@@ -57,18 +69,30 @@ class Robot(peripherals: Peripherals):  CompetitionRobot{
             }
 
             if (input.b.isNowPressed) {
+                //  down
                 arm.target = MotorControl.Position(ARM_DOWN, ARM_SPEED)
-                elbow.target = MotorControl.Position(ELBOW_DOWN, ARM_SPEED)
+                elbow.target = MotorControl.Position(ElBOW_DOWN, ARM_SPEED)
+                wrist.target = MotorControl.Position(WRIST_DOWN, ARM_SPEED)
             }
 
             if (input.a.isNowPressed) {
-                arm.target = MotorControl.Position(ARM_MID, ARM_SPEED)
-                elbow.target = MotorControl.Position(ELBOW_MID, ARM_SPEED)
+                //mid score
+                arm.target = MotorControl.Position(ARM_LOW, ARM_SPEED)
+                elbow.target = MotorControl.Position(ElBOW_LOW, ARM_SPEED)
+                wrist.target = MotorControl.Position(WRIST_LOW, ARM_SPEED)
             }
-
-            if (input.x.isNowPressed) {
-                arm.target = MotorControl.Position(ARM_UP, ARM_SPEED)
-                elbow.target = MotorControl.Position(ElBOW_UP, ARM_SPEED)
+//
+//            if (input.x.isNowPressed) {
+//                // high score
+//                arm.target = MotorControl.Position(ARM_UP, ARM_SPEED)
+//                elbow.target = MotorControl.Position(ElBOW_UP, ARM_SPEED)
+//            }
+//
+            if (input.y.isNowPressed) {
+                // forward grab
+                arm.target = MotorControl.Position(ARM_FORWARD, ARM_SPEED)
+                elbow.target = MotorControl.Position(ElBOW_FORWARD, ARM_SPEED)
+                wrist.target = MotorControl.Position(WRIST_FORWARD, ARM_SPEED)
             }
 
         } catch (err: DeviceException) {
@@ -77,7 +101,7 @@ class Robot(peripherals: Peripherals):  CompetitionRobot{
     }
 
     override fun autonomousInit() {
-        arm.target = MotorControl.Position(ARM_UP, ARM_SPEED)
+        arm.target = MotorControl.Position(ARM_HIGH, ARM_SPEED)
     }
 
 }
